@@ -5,7 +5,7 @@ import './index.css';
 function Square(props) {
   return (
     <button
-      className="square"
+      className={`square ${props.winningSquare}`}
       onClick={props.onClick}
     >
       {props.value}
@@ -15,8 +15,11 @@ function Square(props) {
 
 class Board extends React.Component {
   renderSquare(i) {
+    const winningCombo = this.props.winningCombo;
+    const winningSquare = winningCombo && winningCombo.indexOf(i) > -1 ? "winning-square" : "";
     return (
       <Square
+        winningSquare={winningSquare}
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)} 
       />
@@ -62,7 +65,7 @@ class Game extends React.Component {
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return squares[a];
+        return { winner: squares[a], winningCombo: lines[i] };
       }
     }
     return null;
@@ -99,10 +102,13 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[history.length - 1];
-    const winner = this.calculateWinner(current.squares);
-    const status = winner ?
-      `Winner: ${winner}` :
-      `Next player: ${this.getPlayerString(this.state.xIsNext)}`;
+    const result = this.calculateWinner(current.squares);
+    let status = `Next player: ${this.getPlayerString(this.state.xIsNext)}`;
+    let winningCombo = null;
+    if (result) {
+      status = `Winner: ${result.winner}`;
+      winningCombo = result.winningCombo; 
+    }
 
     const locationList = ['(1,1)', '(2,1)', '(3,1)', '(1,2)', '(2,2)', '(3,2)', '(1,3)', '(2,3)', '(3,3)'];
     const moves = history.map((step, move) => {
@@ -121,7 +127,8 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-board">
-          <Board   
+          <Board
+            winningCombo={winningCombo}
             squares={current.squares}
             onClick={(i) => this.handleClick(i)}
           />
