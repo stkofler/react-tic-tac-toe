@@ -111,9 +111,7 @@ class Game extends React.Component {
     const locationList = ['(1,1)', '(2,1)', '(3,1)', '(1,2)', '(2,2)', '(3,2)', '(1,3)', '(2,3)', '(3,3)'];
     const moves = history.map((step, move) => {
       const location = locationList[step.lastMove];
-      const desc = move ?
-        `Go to move #${move} at location: ${location}` :
-        'New Game';
+      const desc = move ? `Go to move #${move} at location: ${location}` : 'New Game';
 
       const className = this.state.stepNumber === move ? 'highlight-listitem' : ''; 
       return (
@@ -122,6 +120,10 @@ class Game extends React.Component {
         </li>
       );
     });
+
+    if (this.state.stepNumber === 9 && !result) {
+      status = 'Game ends in a draw!'; 
+    }
 
     return (
       <div className="game">
