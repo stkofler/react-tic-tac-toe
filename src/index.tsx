@@ -2,7 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-function Square(props) {
+type SquareProps = {
+  value: string,
+  winningSquare: string,
+  onClick: () => void,
+}
+
+function Square(props: SquareProps) {
   return (
     <button
       className={`square ${props.winningSquare}`}
@@ -13,8 +19,18 @@ function Square(props) {
   );
 }
 
+type BoardProps = {
+  winningCombo: number[],
+  squares: string[],
+  onClick: (i: number) => void, 
+}
+
 class Board extends React.Component {
-  renderSquare(i) {
+  constructor (public props: BoardProps) {
+    super(props);
+  }
+
+  renderSquare(i: number) {
     const winningCombo = this.props.winningCombo;
     const winningSquare = winningCombo && winningCombo.indexOf(i) > -1 ? 'winning-square' : '';
     return (
@@ -49,17 +65,30 @@ class Board extends React.Component {
   }
 }
 
-class Game extends React.Component {
-  constructor (props) {
+type MoveHistory = {
+  squares: string[],
+  lastMove: number,
+}
+
+type GameState = {
+  history: MoveHistory[],
+  xIsNext: boolean,
+  stepNumber: number,
+}
+
+type GameProps = {};
+
+class Game extends React.Component<GameProps, GameState> {
+  constructor (props: GameProps) {
     super(props);
     this.state = {
-      history: [{ squares: Array(9).fill(null), lastMove: null }],
+      history: [{ squares: Array(9).fill(null), lastMove: -1 }],
       xIsNext: true,
       stepNumber: 0,
     }
   }
 
-  calculateWinner(squares) {
+  calculateWinner(squares: string[]) {
     const lines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
 
     for (let i = 0; i < lines.length; i++) {
@@ -71,11 +100,11 @@ class Game extends React.Component {
     return null;
   }
 
-  getPlayerString(xIsNext) {
+  getPlayerString(xIsNext: boolean) {
     return xIsNext ? 'X': 'O';
   }
 
-  handleClick(i) {
+  handleClick(i: number) {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length -1];
     const squares = current.squares.slice();
@@ -90,7 +119,7 @@ class Game extends React.Component {
     });
   }
 
-  jumpTo(step) {
+  jumpTo(step: number) {
     this.setState({
       stepNumber: step,
       xIsNext: (step % 2) === 0,
@@ -102,7 +131,7 @@ class Game extends React.Component {
     const current = history[this.state.stepNumber];
     const result = this.calculateWinner(current.squares);
     let status = `Next player: ${this.getPlayerString(this.state.xIsNext)}`;
-    let winningCombo = null;
+    let winningCombo: number[] = [];
     if (result) {
       status = `Winner: ${result.winner}`;
       winningCombo = result.winningCombo; 
