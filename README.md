@@ -1,3 +1,9 @@
+This simply completes the [React tic-tac-toe tutorial](https://reactjs.org/tutorial/tutorial.html) and adds a little style to it.
+
+![screenshot](screenshot.png)
+
+Original README.md:
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
