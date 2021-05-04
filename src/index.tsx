@@ -80,6 +80,14 @@ type GameResult = {
 } | undefined;
 
 class Game extends React.Component<GameProps, GameState> {
+  static initialState(): GameState {
+    return {
+      history: [{ squares: Array.from({ length: 9 }), lastMove: 0 }],
+      xIsNext: true,
+      stepNumber: 0,
+    };
+  }
+
   static calculateWinner(squares: SquareType[]): GameResult {
     const lines = [
       [0, 1, 2], [3, 4, 5], [6, 7, 8], // horizontal
@@ -102,11 +110,7 @@ class Game extends React.Component<GameProps, GameState> {
 
   constructor(props: GameProps) {
     super(props);
-    this.state = {
-      history: [{ squares: Array.from({ length: 9 }), lastMove: -1 }],
-      xIsNext: true,
-      stepNumber: 0,
-    };
+    this.state = Game.initialState();
   }
 
   handleClick(i: number) {
@@ -131,6 +135,10 @@ class Game extends React.Component<GameProps, GameState> {
     });
   }
 
+  restartGame(): void {
+    this.setState(Game.initialState());
+  }
+
   render() {
     const { history, xIsNext, stepNumber } = this.state;
     const current = history[stepNumber];
@@ -144,15 +152,14 @@ class Game extends React.Component<GameProps, GameState> {
 
     const locationList = ['(1,1)', '(2,1)', '(3,1)', '(1,2)', '(2,2)', '(3,2)', '(1,3)', '(2,3)', '(3,3)'];
     const moves = history.map((step, move) => {
+      if (move === 0) return '';
       const location = locationList[step.lastMove];
-      const desc = move ? `Go to move #${move} at location: ${location}` : 'New Game';
+      const desc = `Move #${move} at coords ${location}`;
 
       const className = stepNumber === move ? 'highlight-listitem' : '';
       return (
         // eslint-disable-next-line react/no-array-index-key
-        <li key={move}>
-          <button type="button" className={className} onClick={() => this.jumpTo(move)}>{desc}</button>
-        </li>
+        <button key={move} type="button" className={className} onClick={() => this.jumpTo(move)}>{desc}</button>
       );
     });
 
@@ -162,6 +169,15 @@ class Game extends React.Component<GameProps, GameState> {
 
     return (
       <div className="game">
+        <div className="game-info star-wars">
+          <div className="crawl">
+            {moves}
+            <div className="next-player">
+              <div>{status}</div>
+            </div>
+          </div>
+          <div className="fade" />
+        </div>
         <div className="game-board">
           <Board
             winningCombo={winningCombo}
@@ -169,9 +185,8 @@ class Game extends React.Component<GameProps, GameState> {
             onClick={(i) => this.handleClick(i)}
           />
         </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol className="move-history">{moves}</ol>
+        <div className="new-game">
+          <button type="button" onClick={() => this.restartGame()}>Start a New Game!</button>
         </div>
       </div>
     );
