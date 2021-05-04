@@ -143,10 +143,10 @@ class Game extends React.Component<GameProps, GameState> {
     const { history, xIsNext, stepNumber } = this.state;
     const current = history[stepNumber];
     const result = Game.calculateWinner(current.squares);
-    let status = `Next player: ${Game.getPlayerString(xIsNext)}`;
+    let status = `Next Player ${Game.getPlayerString(xIsNext)}`;
     let winningCombo: number[] = [];
     if (result) {
-      status = `Winner: ${result.winner}`;
+      status = `Winner ${result.winner}`;
       winningCombo = result.winningCombo;
     }
 
@@ -164,29 +164,32 @@ class Game extends React.Component<GameProps, GameState> {
     });
 
     if (stepNumber === 9 && !result) {
-      status = 'Game ends in a draw!';
+      status = 'Draw!';
     }
 
     return (
-      <div className="game">
-        <div className="game-info star-wars">
-          <div className="crawl">
-            {moves}
-            <div className="next-player">
-              <div>{status}</div>
+      <div className="main">
+        <div>
+          <div className="place-holder" />
+          <div className="next-player">{status}</div>
+        </div>
+        <div className="game">
+          <div className="game-info star-wars">
+            <div className="crawl">
+              {moves}
             </div>
+            <div className="fade" />
           </div>
-          <div className="fade" />
-        </div>
-        <div className="game-board">
-          <Board
-            winningCombo={winningCombo}
-            squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
-          />
-        </div>
-        <div className="new-game">
-          <button type="button" onClick={() => this.restartGame()}>Start a New Game!</button>
+          <div className="game-board">
+            <Board
+              winningCombo={winningCombo}
+              squares={current.squares}
+              onClick={(i) => this.handleClick(i)}
+            />
+          </div>
+          <div className="new-game">
+            <button type="button" onClick={() => this.restartGame()}>Start a New Game!</button>
+          </div>
         </div>
       </div>
     );
